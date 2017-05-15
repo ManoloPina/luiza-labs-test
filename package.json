@@ -14,7 +14,8 @@
     "react-bootstrap": "^0.31.0",
     "react-dom": "^15.5.4",
     "react-gmaps": "^1.6.0",
-    "react-google-maps": "^6.3.0"
+    "react-google-maps": "^6.3.0",
+    "svgo-loader": "^1.2.1"
   },
   "devDependencies": {
     "react-scripts": "0.9.5"
