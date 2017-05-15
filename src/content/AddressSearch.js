@@ -5,6 +5,8 @@ import {
 import Constants from '../Constants';
 import _ from 'lodash';
 import $ from 'jquery';
+import { Gmaps } from 'react-gmaps';
+import geocoder from 'geocoder';
 
 class AddressSearch extends Component {
   constructor(props) {
@@ -19,7 +21,9 @@ class AddressSearch extends Component {
       localidade: "",
       logradouro: "",
       uf: "",
-      unidade: ""
+      unidade: "",
+      lng: 0,
+      lat: 0
     }
   }
 
@@ -40,6 +44,14 @@ class AddressSearch extends Component {
                   <p className="text-left">{this.state.bairro}</p>
                   <p className="text-left">{this.state.localidade} - {this.state.uf}</p>
                   <p className="text-left">{this.state.cep}</p>
+                  <Gmaps
+                    className="img-thumbnail"
+                    width={'100%'}
+                    height={'300px'}
+                    lat={this.state.lt}
+                    lng={this.state.lng}
+                    zoom={17}>
+                  </Gmaps>
                 </Jumbotron>
               )}
           </Col>
@@ -54,29 +66,43 @@ class AddressSearch extends Component {
       this.setState({ cep: e.detail });
       resolve();
     }).then(() => {
-      $.ajax({
-        url: `https://viacep.com.br/ws/${this.state.cep}/json/?callback=myf`,
-        type: 'GET',
-        contentType: 'application/json'
-      })
-        .done(data => {
-          let strReplace = data.replace('myf(', '');
-          let strReplace2 = strReplace.replace(');', '');
-          let adressObject = JSON.parse(strReplace2);
-          this.setState({
-            cep: adressObject.cep,
-            logradouro: adressObject.logradouro,
-            complemento: adressObject.complemento,
-            bairro: adressObject.bairro,
-            localidade: adressObject.localidade,
-            uf: adressObject.uf,
-            unidade: adressObject.unidade,
-            ibge: adressObject.ibge,
-            gia: adressObject.gia
-          });
-          console.log('state', this.state);
+      return new Promise((resolve, reject) => {
+        $.ajax({
+          url: `https://viacep.com.br/ws/${this.state.cep}/json/?callback=myf`,
+          type: 'GET',
+          contentType: 'application/json'
         })
-        .fail(err => console.log('err', console.log('err', err)));
+          .done(data => {
+            let strReplace = data.replace('myf(', '');
+            let strReplace2 = strReplace.replace(');', '');
+            let adressObject = JSON.parse(strReplace2);
+            this.setState({
+              cep: adressObject.cep,
+              logradouro: adressObject.logradouro,
+              complemento: adressObject.complemento,
+              bairro: adressObject.bairro,
+              localidade: adressObject.localidade,
+              uf: adressObject.uf,
+              unidade: adressObject.unidade,
+              ibge: adressObject.ibge,
+              gia: adressObject.gia
+            });
+            console.log('state', this.state);
+            resolve(this.state);
+          })
+          .fail(err => console.log('err', console.log('err', err)));
+
+      });
+
+    }).then(() => {
+      geocoder.geocode(`${this.state.logradouro}, ${this.state.localidade} - ${this.state.uf}`,(err, data) => {
+        console.log(data);
+        this.setState({
+          lt: data.results[0].geometry.location.lat,
+          lng: data.results[0].geometry.location.lng
+        });
+        console.log(this.state.lt);
+      });
     });
   }
 }

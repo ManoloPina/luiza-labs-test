@@ -4,11 +4,17 @@
   "private": true,
   "dependencies": {
     "bootstrap": "3",
+    "geocoder": "^0.2.3",
+    "google": "^2.1.0",
+    "google-maps-react": "^1.0.19",
     "jquery": "^3.2.1",
     "lodash": "^4.17.4",
+    "node-geocoder": "^3.16.0",
     "react": "^15.5.4",
     "react-bootstrap": "^0.31.0",
-    "react-dom": "^15.5.4"
+    "react-dom": "^15.5.4",
+    "react-gmaps": "^1.6.0",
+    "react-google-maps": "^6.3.0"
   },
   "devDependencies": {
     "react-scripts": "0.9.5"
